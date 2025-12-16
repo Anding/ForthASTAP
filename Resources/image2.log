@@ -1,0 +1,7 @@
+
+21:27:34  "c:\program files\astap\astap.exe" -f image2.xisf -log
+21:27:34  Using star database D50
+21:27:34  Creating grayscale x 2 binning image for solving or star alignment.
+21:27:35  522 stars, 395 quads selected in the image. 349 database stars, 264 database quads required for the 1.70° square search window. Step size 1.70°. Oversize 1.00
+21:27:35  180 of 181 quads selected matching within 0.007 tolerance.  Solution["] x:=0.128297x+ -1.444985y+ 2615.675239,  y:=1.444588x+ 0.128465y+ -4780.216343
+21:27:35  Solution found:  5: 26  16.83	+16° 36  18.5	 Solved in 0.3 sec.	 Δ was 6.3'.	 Mount Δα=-53.5d,  Δδ=940.2d. 	 Used stars down to magnitude: 13.6
