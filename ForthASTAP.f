@@ -1,22 +1,27 @@
-include e:\coding\forthbase\libraries\libraries.f
 need finiteFractions
 
 \ values presented in the .ini file are parsed as floating point numbers by VFX Forth
 \ RA is presented in degrees, so divide by 24
-5.6768965776997369E+001 1.5E+1 f/ 
-fp~~~ 
-CR ~~~.
+s" 5.6768965776997369E+001" >float drop s" 15.0" >float drop f/ 
+fp~
+CR dup ~.
+CR dup ~$ type
+CR 'h' 'm' 0 ~custom$ type
 
 \ Declination in degrees
-2.3889596666131958E+001 
-fp~~~
-CR ~~~.
+s" 2.3889596666131958E+001" >float drop
+fp~
+CR dup ~.
+CR dup ~$ type
+CR 'd' ''' -1 ~custom$ type
 
 \ Test if negative numbers also handled
--8.5041715965678577E+001
-fp~~~ 
-CR ~~~.
+s" -8.5041715965678577E+001" >float drop
+fp~ 
+CR dup ~.
+CR dup ~$ type
+CR 'd' ''' -1 ~custom$ type
 
 CR
 
-\\ problems here - check how to define VFX floating point recogntion characters
+\ problems here - check how to define VFX floating point recogntion characters
