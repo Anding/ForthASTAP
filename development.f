@@ -24,4 +24,8 @@ CR 'd' ''' -1 ~custom$ type
 
 CR
 
-\ problems here - check how to define VFX floating point recogntion characters
+
+s" Astap -f E:\coding\ForthASTAP\Resources\image1.xisf" ShellCmd
+
+( c-addr u) ASTAP.buffer 9 + move
+s" Astap -f " ASTAP.buffer swap move

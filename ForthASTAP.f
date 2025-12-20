@@ -1,6 +1,6 @@
 need finiteFractions
 
-256 buffer: ASTAP.linebuffer
+256 buffer: ASTAP.buffer
 	
 \ compute a hash h1 by hashing x1 and h0
 : ASTAP.hash ( x1 h0 -- h1)
@@ -24,7 +24,7 @@ need finiteFractions
 	caddr u r/o open-file ( file-id IOR ) ?dup if exit then >R
 	0 -> flag	
 	begin
-		ASTAP.linebuffer dup 256 R@ ( c-addr c-addr u1 fileid) read-line ( c-addr u2 flag ior) drop
+		ASTAP.buffer dup 256 R@ ( c-addr c-addr u1 fileid) read-line ( c-addr u2 flag ior) drop
 	while
 		2dup drop 6 ASTAP.hash$ ( c-addr u2 h)
 		case
@@ -36,5 +36,13 @@ need finiteFractions
 	drop drop 	
 	R> close-file drop	
 	flag if ra dec 0 else -1 then
+;
+
+\ Invoke ASTAP for a plate solve
+: ASTAP.invoke ( caddr u)
+	dup >R
+	( c-addr u) ASTAP.buffer 9 + move
+	s" Astap -f " ASTAP.buffer swap move
+	ASTAP.buffer R> 9 + ShellCmd
 ;
 		
