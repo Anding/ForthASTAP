@@ -28,8 +28,8 @@ need finiteFractions
 	while
 		2dup drop 6 ASTAP.hash$ ( c-addr u2 h)
 		case
-		-1959004665 ( "CRVAL1") of 7 /string >float drop fp~ -> ra -1 -> flag endof
-		-1959004666 ( "CRVAL2") of 7 /string >float drop fp~ -> dec endof
+		-1959004665 ( "CRVAL1") of 7 /string >float drop 1.5E1 f/ fp~ -> ra endof		\ degrees to hours
+		-1959004666 ( "CRVAL2") of 7 /string >float drop fp~ -> dec -1 -> flag endof
 		nip nip 
 		endcase
 	repeat
@@ -38,7 +38,3 @@ need finiteFractions
 	flag if ra dec 0 else -1 then
 ;
 		
-: test
-	s" E:\coding\ForthASTAP\Resources\image1.ini"
-	ASTAP.readINI
-;
