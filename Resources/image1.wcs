@@ -67,5 +67,5 @@ CD2_1   =  4.010945189680E-004 / CD matrix to convert (x,y) to (Ra, Dec)
 CD2_2   =  3.481822107842E-005 / CD matrix to convert (x,y) to (Ra, Dec)        
 PLTSOLVD=                    T / Astrometric solved by ASTAP v2025.11.28.       
 COMMENT 7  Solved in 0.4 sec. Offset 13.7'. Mount offset RA=128.8d, DEC=1357.9d
-COMMENT cmdline:Astap -f E:\coding\ForthASTAP\Resources\image1.xisf
+COMMENT cmdline:ASTAP -f E:\coding\ForthASTAP\Resources\image1.xisf
 END                                                                             

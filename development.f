@@ -25,7 +25,6 @@ CR 'd' ''' -1 ~custom$ type
 CR
 
 
-s" Astap -f E:\coding\ForthASTAP\Resources\image1.xisf" ShellCmd
+\ s" Astap -f E:\coding\ForthASTAP\Resources\image1.xisf & echo %ERRORLEVEL% > E:\test\ASTAP_exitcode.txt" ShellCmd
 
-( c-addr u) ASTAP.buffer 9 + move
-s" Astap -f " ASTAP.buffer swap move
+ s" echo exitcode > E:\test\ASTAP_exitcode.txt" ShellCmd
