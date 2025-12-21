@@ -1,6 +1,7 @@
 need finiteFractions
 
-256 buffer: ASTAP.buffer
+512 buffer: ASTAP.buf0
+512 buffer: ASTAP.buf1	
 	
 \ compute a hash h1 by hashing x1 and h0
 : ASTAP.hash ( x1 h0 -- h1)
@@ -24,7 +25,7 @@ need finiteFractions
 	caddr u r/o open-file ( file-id IOR ) ?dup if exit then >R
 	0 -> flag	
 	begin
-		ASTAP.buffer dup 256 R@ ( c-addr c-addr u1 fileid) read-line ( c-addr u2 flag ior) drop
+		ASTAP.buf0 dup 256 R@ ( c-addr c-addr u1 fileid) read-line ( c-addr u2 flag ior) drop
 	while
 		2dup drop 6 ASTAP.hash$ ( c-addr u2 h)
 		case
@@ -39,10 +40,18 @@ need finiteFractions
 ;
 
 \ Invoke ASTAP for a plate solve
-: ASTAP.invoke ( caddr u)
-	dup >R
-	( c-addr u) ASTAP.buffer 9 + move
-	s" Astap -f " ASTAP.buffer swap move
-	ASTAP.buffer R> 9 + ShellCmd
+\ 	take the full file path of the image as an xisf file
+\  return the full file path of the expected ASTAP ini file
+: ASTAP.invoke { caddr u | m  n -- caddr' u' }
+	ASTAP.buf1 256 42 fill									\ for clarity
+	s" ASTAP -f " dup -> m ASTAP.buf1 swap move  \ m = 9
+	caddr u ASTAP.buf1 m + swap move
+	u m + -> n
+	ASTAP.buf1 n ( 2dup type cr ) ShellCmd
+	n 4 - -> n													\ 4 - to remove the "xisf" extension
+	s" ini" ASTAP.buf1 n + swap move
+	n 3 + m - -> n												\ 3 + to add the "ini" extension
+	ASTAP.buf1 m +  n
 ;
+
 		
