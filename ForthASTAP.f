@@ -18,9 +18,7 @@ need finiteFractions
 ;
 
 
-\ Invoke ASTAP Astrometry Stacking Program to plate solinclude ve an image
-\ 	take the full file path of the image 
-\ 	return the RA and DEC as single integer finite fractions or an IOR on failure
+\ Read the ini file produced by ASTAP after a plate solve
 : ASTAP.readINI { caddr u | ra dec flag -- RA DEC 0  | IOR }
 	caddr u r/o open-file ( file-id IOR ) ?dup if exit then >R
 	0 -> flag	
@@ -44,14 +42,19 @@ need finiteFractions
 \  return the full file path of the expected ASTAP ini file
 : ASTAP.invoke { caddr u | m  n -- caddr' u' }
 	ASTAP.buf1 256 42 fill									\ for clarity
-	s" ASTAP -f " dup -> m ASTAP.buf1 swap move  \ m = 9
+	s" ASTAP -update -f " dup -> m ASTAP.buf1 swap move  \ m = 9
 	caddr u ASTAP.buf1 m + swap move
 	u m + -> n
 	ASTAP.buf1 n ( 2dup type cr ) ShellCmd
 	n 4 - -> n													\ 4 - to remove the "xisf" extension
 	s" ini" ASTAP.buf1 n + swap move
 	n 3 + m - -> n												\ 3 + to add the "ini" extension
-	ASTAP.buf1 m +  n
+	ASTAP.buf1 m + n 
 ;
 
-		
+\ Invoke ASTAP Astrometry Stacking Program to plate solve an image
+\ 	take the full file path of the image 
+\ 	return the RA and DEC as single integer finite fractions or an IOR on failure
+: platesolve { caddr u -- RA DEC 0  | IOR }
+	ASTAP.invoke ASTAP.readINI
+;
