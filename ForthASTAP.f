@@ -41,8 +41,8 @@ need finiteFractions
 \ 	take the full file path of the image as an xisf file
 \  return the full file path of the expected ASTAP ini file
 : ASTAP.invoke { caddr u | m  n -- caddr' u' }
-	ASTAP.buf1 256 42 fill									\ for clarity
-	s" ASTAP -update -f " dup -> m ASTAP.buf1 swap move  \ m = 9
+	ASTAP.buf1 512 42 fill									\ for clarity
+	s" ASTAP -f " dup -> m ASTAP.buf1 swap move  \ m = 9
 	caddr u ASTAP.buf1 m + swap move
 	u m + -> n
 	ASTAP.buf1 n ( 2dup type cr ) ShellCmd
@@ -55,6 +55,13 @@ need finiteFractions
 \ Invoke ASTAP Astrometry Stacking Program to plate solve an image
 \ 	take the full file path of the image 
 \ 	return the RA and DEC as single integer finite fractions or an IOR on failure
-: platesolve { caddr u -- RA DEC 0  | IOR }
-	ASTAP.invoke ASTAP.readINI
+: platesolve { caddr u | m -- RA DEC 0  | IOR }
+	caddr u ASTAP.invoke ASTAP.readINI
+	\ clean up the ASTAP files
+	ASTAP.buf1 512 42 fill									\ for clarity
+	s" E:\coding\ForthASTAP\ASTAPClean.PS1 " dup -> m ASTAP.buf1 swap move
+	caddr u ASTAP.buf1 m + swap move
+	ASTAP.buf1 u m +  2dup type cr ShellCmd
 ;
+
+: test s" E:\coding\ForthASTAP\Resources\image2.xisf" platesolve ;

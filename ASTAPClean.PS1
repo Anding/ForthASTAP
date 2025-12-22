@@ -3,7 +3,9 @@
 $path = $args[0]
 
 $ini = [System.IO.Path]::ChangeExtension($path, ".ini")
-$wcf = [System.IO.Path]::ChangeExtension($path, ".wcf")
+$wcs = [System.IO.Path]::ChangeExtension($path, ".wcs")
+$log = [System.IO.Path]::ChangeExtension($path, ".log")	
 
 Remove-Item -LiteralPath $ini -Force -ErrorAction SilentlyContinue
-Remove-Item -LiteralPath $wcf -Force -ErrorAction SilentlyContinue
+Remove-Item -LiteralPath $wcs -Force -ErrorAction SilentlyContinue
+Remove-Item -LiteralPath $log -Force -ErrorAction SilentlyContinue
