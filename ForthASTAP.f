@@ -20,7 +20,7 @@ need finiteFractions
 
 \ Read the ini file produced by ASTAP after a plate solve
 : ASTAP.readINI { caddr u | ra dec flag -- RA DEC 0  | IOR }
-	caddr u r/o open-file ( file-id IOR ) ?dup if exit then >R
+	caddr u r/o open-file ( file-id IOR ) if exit then >R
 	0 -> flag	
 	begin
 		ASTAP.buf0 dup 256 R@ ( c-addr c-addr u1 fileid) read-line ( c-addr u2 flag ior) drop
@@ -52,16 +52,23 @@ need finiteFractions
 	ASTAP.buf1 m + n 
 ;
 
+\ Wait for ASTAP to complete a plate solve 
+\  take and return the file path of the ini file (or any other ASTAP output file)
+: ASTAP.waitForSolve ( caddr u -- caddr u)
+	100 0 do			\ 10 second timeout
+		2dup FileExists? if unloop exit then
+		100 ms
+	loop
+;
+
 \ Invoke ASTAP Astrometry Stacking Program to plate solve an image
 \ 	take the full file path of the image 
 \ 	return the RA and DEC as single integer finite fractions or an IOR on failure
 : platesolve { caddr u | m -- RA DEC 0  | IOR }
-	caddr u ASTAP.invoke ASTAP.readINI
+	caddr u ASTAP.invoke ASTAP.waitForSolve ASTAP.readINI
 	\ clean up the ASTAP files
 	ASTAP.buf1 512 42 fill									\ for clarity
-	s" E:\coding\ForthASTAP\ASTAPClean.PS1 " dup -> m ASTAP.buf1 swap move
+	s" pwsh.exe -File E:\coding\ForthASTAP\ASTAPClean.PS1 " dup -> m ASTAP.buf1 swap move
 	caddr u ASTAP.buf1 m + swap move
-	ASTAP.buf1 u m +  2dup type cr ShellCmd
+	ASTAP.buf1 u m + ShellCmd
 ;
-
-: test s" E:\coding\ForthASTAP\Resources\image2.xisf" platesolve ;
