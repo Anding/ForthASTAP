@@ -67,8 +67,8 @@ need finiteFractions
 : platesolve { caddr u | m -- RA DEC 0  | IOR }
 	caddr u ASTAP.invoke ASTAP.waitForSolve ASTAP.readINI
 	\ clean up the ASTAP files
-	ASTAP.buf1 512 42 fill									\ for clarity
-	s" pwsh.exe -File E:\coding\ForthASTAP\ASTAPClean.PS1 " dup -> m ASTAP.buf1 swap move
-	caddr u ASTAP.buf1 m + swap move
-	ASTAP.buf1 u m + ShellCmd
+\ ASTAP.buf1 512 42 fill									\ for clarity
+\ s" pwsh.exe -File E:\coding\ForthASTAP\ASTAPClean.PS1 " dup -> m ASTAP.buf1 swap move
+\ caddr u ASTAP.buf1 m + swap move
+\ ASTAP.buf1 u m + ShellCmd
 ;
