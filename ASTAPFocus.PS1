@@ -1,3 +1,6 @@
+# this script file accepts the name of a folder
+# it will identify all the FITS files in the folder, compute the focus and write it to exitcode.txt
+
 param(
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
@@ -8,13 +11,13 @@ param(
 $target = Get-Item -LiteralPath $Folder -ErrorAction Stop
 
 # Gather all .xisf files in the folder and sort them alphabetically by filename.
-$xisfFiles = Get-ChildItem -LiteralPath $target.FullName -Filter '*.xisf' | Sort-Object Name
+$xisfFiles = Get-ChildItem -LiteralPath $target.FullName -Filter '*.fits' | Sort-Object Name
 
-# Handle the case where no .xisf files are found.
+# Handle the case where no .fits files are found.
 if ($xisfFiles.Count -eq 0) {
-    Write-Error "No .xisf files found in $($target.FullName)."
+    Write-Error "No .fits files found in $($target.FullName)."
     $exitCodePath = Join-Path $target.FullName 'exitcode.txt'
-    'NO_FILES_FOUND' | Out-File -FilePath $exitCodePath -Encoding ASCII
+    '0' | Out-File -FilePath $exitCodePath -Encoding ASCII
     exit 1
 }
 
@@ -30,7 +33,8 @@ foreach ($file in $xisfFiles) {
 # Run ASTAP.exe with the generated arguments and capture the exit code.
 $logFile = Join-Path $target.FullName 'astap.log'
 $errorFile = Join-Path $target.FullName 'astap.err'
-$fixedArguments = @('-debug')
+# $fixedArguments = @('-debug')
+$fixedArguments = @('')
 $process = Start-Process -FilePath 'ASTAP.exe' `
     -ArgumentList ($fixedArguments + $focusArguments) `
     -WorkingDirectory $target.FullName `
