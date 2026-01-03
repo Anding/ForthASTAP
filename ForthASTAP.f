@@ -21,17 +21,16 @@ need forth-map
 ;
 
 
-: 10u.~Dec$ ( hr-min-sec | deg-min-sec -- caddr u)
+: 10u.~Dec$ ( deg-min-sec -- caddr u)
  \ format for the :newalpt command
     ':' ':' -1 ~custom$
  ;
  
-: 10u.~RA$ ( hr-min-sec | deg-min-sec -- caddr u)
+: 10u.~RA$ ( hr-min-sec -- caddr u)
  \ format for the :newalpt command
     ':' ':' 0 ~custom$ ( caddr u)
-    \ copy in ".0"
-    2dup + ( caddr u dest) + s" .0" drop ( caddr u dest src) swap 2 ( caddr u src dest n) move ( caddr u)
-    2 +
+    s" HH:MM:SS.0" drop dup >R       
+    ( caddr u dest R:dest) swap move R> 10
  ; 
 
 \ all
@@ -42,11 +41,11 @@ s" " $value ASTAP.reported.Dec
 s" " $value ASTAP.reported.Sidereal
 s" " $value ASTAP.reported.Pierside
 
-: ASTAP.readWCS { caddr u  | file-id -- IOR }
+: ASTAP.wcs ( caddr u  -- IOR)
 \ read a WCS file and populate ASTAP.map with the FITS values
-    caddr u r/o open-file ( file-id IOR ) if exit then -> file-id
+    r/o open-file ( file-id IOR ) if exit then >R
 	begin
-		ASTAP.buf0 dup 256 file-id ( c-addr c-addr u1 fileid) read-line ( c-addr u2 flag ior) drop
+		ASTAP.buf0 dup 256 R@ ( c-addr c-addr u1 fileid) read-line ( c-addr u2 flag ior) drop
 	while
 		2dup drop 8 ASTAP.hash$ ( c-addr u2 h)
 		case
@@ -59,8 +58,8 @@ s" " $value ASTAP.reported.Pierside
 		nip nip 
 		endcase
 	repeat   
-	file-id close-file drop 0
-;
+	R> close-file drop 0
+	;
 
 \ Read the wcs file produced by ASTAP after a plate solve and populate the data
 
@@ -73,7 +72,7 @@ s" " $value ASTAP.reported.Pierside
 		2dup drop 6 ASTAP.hash$ ( c-addr u2 h)
 		case
 		-1959004665 ( "CRVAL1") of 7 /string >float drop 1.5E1 f/ fp~ -> ra endof		\ degrees to hours
-		-1959004666 ( "CRVAL2") of 7 /string >float drop fp~ -> dec -1 -1 -> flag endof
+		-1959004666 ( "CRVAL2") of 7 /string >float drop fp~ -> dec -1 -> flag endof
 		nip nip 
 		endcase
 	repeat
