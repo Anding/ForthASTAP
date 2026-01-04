@@ -1,9 +1,7 @@
 need simple-tester
 include "E:\coding\ForthASTAP\ForthASTAP.f"
 
-need simple-tester
-
-s" E:\coding\ForthASTAP\Resources\88d4125d4216.wcs""  ASTAP.readWCS 
+s" E:\coding\ForthASTAP\Resources\88d4125d4216.wcs"  ASTAP.readWCS 
 
 cr .
  

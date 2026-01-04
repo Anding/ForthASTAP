@@ -15,7 +15,7 @@ need forth-map
 \   used in scanning a .wcs file
 : ASTAP.hash$ ( c-addr u -- h)
 	swap 2dup + swap ( u end+1 start)
-		?do													\ Let h0 = u
+		?do											\ Let h0 = u
 			i c@ ( h_i x) swap ASTAP.hash ( h_j) 	\ j = i + 1
 		loop
 ;
@@ -53,16 +53,11 @@ s" " $value ASTAP.reported.Pierside$
 	while
 		2dup drop 8 ASTAP.hash$ ( c-addr u2 h)
 	case
-		1035617187  ( "CRVAL1  ") of                \ CRVAL1 reports RA in degrees
-		    drop 10 + 20 >float drop 1.5E1 f/ fp~ 
-		    dup -> ASTAP.solved.RA
-		    10u.~RA$ $-> ASTAP.solved.RA$     
+		1035617187  ( "CRVAL1  ") of                
+		    drop 10 + 20 >float drop 1.5E1 f/   \ CRVAL1 reports RA in degrees
+		    fp~ -> ASTAP.solved.RA    
 		endof
-		1035616990  ( "CRVAL2  ") of 
-		    drop 10 + 20 >float drop fp~ 
-		    dup -> ASTAP.solved.Dec
-		    10u.~Dec$ $-> ASTAP.solved.Dec$    
-		endof
+		1035616990  ( "CRVAL2  ") of drop 10 + 20 >float drop fp~ -> ASTAP.solved.Dec   endof
 		602714565   ( "OBJCTRA ") of drop 10 + 10 >number~ -> ASTAP.reported.RA         endof
 		602712226   ( "OBJCTDEC") of drop 10 + 10 >number~ -> ASTAP.reported.Dec        endof  
 		-1898806661 ( "SIDEREAL") of drop 10 + 10 >number~ -> ASTAP.reported.Sidereal   endof
@@ -135,7 +130,3 @@ s" " $value ASTAP.reported.Pierside$
     caddr u ASTAP.buf1 m + swap move
     ASTAP.buf1 u m + ShellCmd
 ;
-
-
-
-: ASTAP
