@@ -3,13 +3,13 @@ include "E:\coding\ForthASTAP\ForthASTAP.f"
 
 need simple-tester
 
-s" E:\coding\ForthASTAP\Resources\test.ini"  ASTAP.readWCS 
+s" E:\coding\ForthASTAP\Resources\88d4125d4216.wcs""  ASTAP.readWCS 
 
 cr .
  
-ASTAP.solved.RA$             cr type
-ASTAP.solved.Dec$            cr type
-ASTAP.reported.RA$           cr type
-ASTAP.reported.Dec$          cr type
-ASTAP.reported.Sidereal$     cr type
-ASTAP.reported.Pierside$     cr type  
+ASTAP.solved.RA             cr .RA
+ASTAP.solved.Dec            cr .Dec
+ASTAP.reported.RA           cr .RA
+ASTAP.reported.Dec          cr .Dec
+ASTAP.reported.Sidereal     cr .RA
+ASTAP.reported.Pierside$    cr type  

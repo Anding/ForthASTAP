@@ -35,16 +35,12 @@ need forth-map
 
 \ Global values obtained from scanning the ASTAP WCS file
 
-\ finite fraction single integer format
-s" " value ASTAP.solved.RA
-s" " value ASTAP.solved.Dec
-
-\ string format compatible with the 10Micron :newalpt command
-s" " $value ASTAP.solved.RA$
-s" " $value ASTAP.solved.Dec$
-s" " $value ASTAP.reported.RA$
-s" " $value ASTAP.reported.Dec$
-s" " $value ASTAP.reported.Sidereal$
+\ finite fraction single integer format, J2000 as read from the FITS file
+0 value ASTAP.solved.RA
+0 value ASTAP.solved.Dec
+0 value ASTAP.reported.RA
+0 value ASTAP.reported.Dec
+0 value ASTAP.reported.Sidereal
 s" " $value ASTAP.reported.Pierside$
 
 \ Read the wcs file produced by ASTAP after a plate solve and populate the data
@@ -60,25 +56,29 @@ s" " $value ASTAP.reported.Pierside$
 		1035617187  ( "CRVAL1  ") of                \ CRVAL1 reports RA in degrees
 		    drop 10 + 20 >float drop 1.5E1 f/ fp~ 
 		    dup -> ASTAP.solved.RA
-		    \ *** convert J2000 to JNOW for reporting back to the mount
 		    10u.~RA$ $-> ASTAP.solved.RA$     
 		endof
 		1035616990  ( "CRVAL2  ") of 
 		    drop 10 + 20 >float drop fp~ 
 		    dup -> ASTAP.solved.Dec
-		    \ *** convert J2000 to JNOW for reporting back to the mount		    
 		    10u.~Dec$ $-> ASTAP.solved.Dec$    
 		endof
-		602714565   ( "OBJCTRA ") of drop 10 + 10 >number~ 10u.~RA$     $-> ASTAP.reported.RA$          endof  \ *** replace with RA_JNOW
-		602712226   ( "OBJCTDEC") of drop 10 + 10 >number~ 10u.~Dec$    $-> ASTAP.reported.Dec$         endof  \ *** replace with DECJNOW
-		-1898806661 ( "SIDEREAL") of drop 10 + 10 >number~ 10u.~RA$     $-> ASTAP.reported.Sidereal$    endof
-		1151949815  ( "PIERSIDE") of drop 10 + 1                        $-> ASTAP.reported.Pierside$    endof
+		602714565   ( "OBJCTRA ") of drop 10 + 10 >number~ -> ASTAP.reported.RA         endof
+		602712226   ( "OBJCTDEC") of drop 10 + 10 >number~ -> ASTAP.reported.Dec        endof  
+		-1898806661 ( "SIDEREAL") of drop 10 + 10 >number~ -> ASTAP.reported.Sidereal   endof
+		1151949815  ( "PIERSIDE") of drop 10 + 1          $-> ASTAP.reported.Pierside$  endof
 	    nip nip 
 	endcase
 	repeat   
 	drop drop
 	R> close-file drop 0
 ;
+
+: ASTAP.formatALPT ( -- caddr u)
+\ Take the global plate parameters, convert to JNOW and format the 10u :newaslpt command string
+	s" :newalpt                               "
+;
+
 
 \ Read the ini file produced by ASTAP after a plate solve and report the solved RA and Dec
 : ASTAP.readINI { caddr u | ra dec flag -- RA DEC 0  | IOR }
