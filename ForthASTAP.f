@@ -1,41 +1,14 @@
 need forthbase
 need finiteFractions
 need forth-map   
-
-512 buffer: ASTAP.buf0
-512 buffer: ASTAP.buf1	
-	
-\ compute a hash h1 by hashing x1 and h0
-: ASTAP.hash ( x1 h0 -- h1)
-	31 * swap 13 + xor
-;	
-	
-\ hash a string to a single value on stack
-\ 	borrowed from simple-tester
-\   used in scanning a .wcs file
-: ASTAP.hash$ ( c-addr u -- h)
-	swap 2dup + swap ( u end+1 start)
-		?do											\ Let h0 = u
-			i c@ ( h_i x) swap ASTAP.hash ( h_j) 	\ j = i + 1
-		loop
-;
-
-
-: 10u.~Dec$ ( deg-min-sec -- caddr u)
- \ format for the :newalpt command
-    ':' ':' -1 ~custom$
- ;
- 
-: 10u.~RA$ ( hr-min-sec -- caddr u)
- \ format for the :newalpt command
-    ':' ':' 0 ~custom$ ( caddr u)
-    s" HH:MM:SS.0" drop dup >R       
-    ( caddr u dest R:dest) swap move R> 10
- ; 
+    
+\ a string values and buffers to construct command and output strings and read inputs
+s" " $value ASTAP.str0      
+s" " $value ASTAP.str1
+256 buffer: ASTAP.buf0
 
 \ Global values obtained from scanning the ASTAP WCS file
-
-\ finite fraction single integer format, J2000 as read from the FITS file
+\   finite fraction single integer format, J2000 as read from the FITS file
 0 value ASTAP.solved.RA
 0 value ASTAP.solved.Dec
 0 value ASTAP.reported.RA
@@ -43,7 +16,19 @@ need forth-map
 0 value ASTAP.reported.Sidereal
 s" " $value ASTAP.reported.Pierside$
 
-\ Read the wcs file produced by ASTAP after a plate solve and populate the data
+\ compute a hash h1 by hashing x1 and h0
+\ 	borrowed from simple-tester and used in scanning a .wcs file
+: ASTAP.hash ( x1 h0 -- h1)
+	31 * swap 13 + xor
+;	
+	
+\ hash a string to a single value on stack
+: ASTAP.hash$ ( c-addr u -- h)
+	swap 2dup + swap ( u end+1 start)
+	?do											\ Let h0 = u
+		i c@ ( h_i x) swap ASTAP.hash ( h_j) 	\ j = i + 1
+	loop
+;
 
 : ASTAP.readWCS ( caddr u  -- IOR)
 \ read a WCS file and populate the ForthASTAP globals with the relevant FITS values
@@ -69,64 +54,82 @@ s" " $value ASTAP.reported.Pierside$
 	R> close-file drop 0
 ;
 
+: ASTAP.readFocus ( addr u -- errlevel focuspos 0 | IOR)
+\ read the exitcode.txt file produced by ASTAPFocus.PS1 and report focus position and error level
+    r/o open-file ( file-id IOR ) if exit then >R       \ open-file failed
+    ASTAP.buf0 dup 256 R> ( c-addr c-addr u1 fileid) read-line ( c-addr u2 flag ior) drop
+    if isInteger? 1 = 
+        if
+            10000 /MOD ( errlevel focuspos)
+            dup 0= if
+                2drop -1 exit       \ ASTAP ran but focus not found
+            else
+                0 exit              \ ASTAP ran and focus was found
+            then
+        else 
+            -1 exit                 \ the text is not an integer
+        then 
+    else
+        2drop -1 exit               \ file is empty
+    then  
+;
+
+: 10u.~Dec$ ( deg-min-sec -- caddr u)
+ \ format for the :newalpt command
+    ':' ':' -1 ~custom$
+ ;
+ 
+: 10u.~RA$ ( hr-min-sec -- caddr u)
+ \ format for the :newalpt command
+    ':' ':' 0 ~custom$ ( caddr u)
+    s" HH:MM:SS.0" drop dup >R       
+    ( caddr u dest R:dest) swap move R> 10
+ ; 
+
 : ASTAP.formatALPT ( -- caddr u)
 \ Take the global plate parameters, convert to JNOW and format the 10u :newaslpt command string
 	s" :newalpt                               "
 ;
 
+\ Invoke PowerShell scripts to run ASTAP
 
-\ Read the ini file produced by ASTAP after a plate solve and report the solved RA and Dec
-: ASTAP.readINI { caddr u | ra dec flag -- RA DEC 0  | IOR }
-	0 -> flag
-	caddr u r/o open-file ( file-id IOR ) if exit then >R
-	begin
-		ASTAP.buf0 dup 256 R@ ( c-addr c-addr u1 fileid) read-line ( c-addr u2 flag ior) drop
-	while
-		2dup drop 6 ASTAP.hash$ ( c-addr u2 h)
-		case
-		-1959004665 ( "CRVAL1") of 7 /string >float drop 1.5E1 f/ fp~ -> ra endof		\ degrees to hours
-		-1959004666 ( "CRVAL2") of 7 /string >float drop fp~ -> dec -1 -> flag endof
-		nip nip 
-		endcase
-	repeat
-	drop drop 	
-	R> close-file drop	
-	flag if ra dec 0 else -1 then
-;
-
-\ Invoke ASTAP for a plate solve
-\ 	take the full file path of the image as an xisf file
-\  return the full file path of the expected ASTAP wcs file
-: ASTAP.invoke { caddr u | m  n -- caddr' u' }
-	ASTAP.buf1 512 42 fill                                      \ for debug clarity
-	s" ASTAP -f " dup -> m ASTAP.buf1 swap move                 \ m = 9
-	caddr u ASTAP.buf1 m + swap move
-	u m + -> n
-	ASTAP.buf1 n ( 2dup type cr ) ShellCmd
-	n 4 - -> n                                                  \ 4 - to remove the "xisf" or "fits" extension
-	s" wcs" ASTAP.buf1 n + swap move
-	n 3 + m - -> n												\ 3 + to add the "ini" extension
-	ASTAP.buf1 m + n 
-;
-
-\ Wait for ASTAP to complete a plate solve 
-\  take and return the file path of the wcs file
-: ASTAP.waitForSolve ( caddr u -- caddr u)
-	100 0 do			\ 10 second timeout
-		2dup FileExists? if unloop exit then
+: ASTAP.waitForFile ( caddr u -- IOR)
+\ Wait for creation of a file and return an IOR
+	200 0 do			\ 20 second timeout
+		2dup FileExists? if unloop 2drop 0 exit then
 		100 ms
 	loop
+	2drop -1
+;
+
+: ASTAP.solveFolder ( caddr u -- IOR)
+\ Take a folder path, invoke ASTAP for each image (.xisf or .fits) in that folder
+\ List the created .wcs files in WCS-LIST.txt
+\ Return an IOR = 0 if the process completed successfully (regardless of how many of the images were successfully solved)
+    s" pwsh.exe -File E:\coding\ForthASTAP\PowerShell\ASTAPRunFolder.PS1  " $-> ASTAP.str0
+    2dup $+> ASTAP.str0
+    ASTAP.str0 ShellCmd
+    ( caddr u) $-> ASTAP.str1 s" \WCS-LIST.txt" $+> ASTAP.str1
+    ASTAP.str1 ASTAP.waitForFile
+;
+
+: ASTAP.solveFile ( caddr u -- RA DEC 0  | -1 )
+\ Take a filename with fullpath and invoke ASTAP
+\ Return an IOR = 0 
+    s" pwsh.exe -File E:\coding\ForthASTAP\PowerShell\ASTAPRun.PS1  " $-> ASTAP.str0 
+    2dup $+> ASTAP.str0
+    ASTAP.str0 ShellCmd
+    2dup 4 - ( caddr u') $-> ASTAP.str1 s" ini" $+> ASTAP.str1
+    ASTAP.str1 ASTAP.waitForFile if 2drop -1 exit then       \ no ini file was produced
+    4 - ( caddr u') $-> ASTAP.str1 s" wcs" $+> ASTAP.str1
+    ASTAP.str1 ASTAP.readWCS 0= if
+        ASTAP.solved.RA ASTAP.solved.Dec 0
+    else -1 then
 ;
 
 \ Invoke ASTAP Astrometry Stacking Program to plate solve an image
 \ 	take the full file path of the image 
 \ 	return the RA and DEC as single integer finite fractions or an IOR on failure
-: platesolve { caddr u | m -- RA DEC 0  | IOR }
-	caddr u ASTAP.invoke ASTAP.waitForSolve ASTAP.readWCS
-	if ASTAP.solved.RA ASTAP.solved.Dec 0 else -1 then
-	\ clean up the ASTAP files
-    ASTAP.buf1 512 42 fill									\ for clarity
-    s" pwsh.exe -File E:\coding\ForthASTAP\ASTAPClean.PS1 " dup -> m ASTAP.buf1 swap move
-    caddr u ASTAP.buf1 m + swap move
-    ASTAP.buf1 u m + ShellCmd
+: platesolve ( caddr u -- RA DEC 0  | IOR )
+	ASTAP.solveFile 
 ;

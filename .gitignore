@@ -1,6 +1,6 @@
 # Testdata is static and will be manually transferred
 
-Testdata/
+Testdata
 
 # Visual Studio
 # Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
