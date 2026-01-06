@@ -87,8 +87,41 @@ s" " $value ASTAP.reported.Pierside$
  ; 
 
 : ASTAP.formatALPT ( -- caddr u)
-\ Take the global plate parameters, convert to JNOW and format the 10u :newaslpt command string
-	s" :newalpt                               "
+\ Take the global plate parameters, convert to JNOW and format the 10u :newaslpt command string ready for execution
+    s\" s\" " $-> ASTAP.str0
+    ASTAP.reported.RA 10u.~RA$ $+> ASTAP.str0       s" ," $+> ASTAP.str0
+    ASTAP.reported.Dec 10u.~Dec$ $+> ASTAP.str0     s" ," $+> ASTAP.str0  
+    ASTAP.reported.Pierside$ $+> ASTAP.str0         s" ," $+> ASTAP.str0
+    ASTAP.solved.RA 10u.~RA$ $+> ASTAP.str0         s" ," $+> ASTAP.str0
+    ASTAP.solved.Dec 10u.~Dec$ $+> ASTAP.str0       s" ," $+> ASTAP.str0   
+    ASTAP.reported.Sidereal  10u.~RA$ $+> ASTAP.str0  
+    s\" \" 10u.AddAlignmentPoint" $+> ASTAP.str0  
+    ASTAP.str0         
+;
+
+: ASTAP.WCS-to-ALPT ( caddr1 u1 -- caddr2 u2 0 | IOR)
+\ take the WCS file specified by caddr1 u1 and prepare a :newalpt command string
+    ASTAP.readWCS ( IOR) if -1 exit then
+    ASTAP.formatALPT 0
+;
+
+: ASTAP.folder-to-ALPT { caddr1 u1 | fid_I fid_O -- caddr2 u2 0 | IOR }
+\ caddr1 u1 specifics a folder containing a WCS-LIST.txt file
+\ caddr2 u2 specifics a resultant output file listing 
+    caddr1 u1 $-> ASTAP.str0 s" \WCS-LIST.txt" $+> ASTAP.str0
+    caddr1 u1 $-> ASTAP.str1 s" \10Umodel.f" $+> ASTAP.str1   
+    ASTAP.str0 r/o open-file ( file-id IOR ) if exit then -> fid_I
+    ASTAP.str1 delete-file drop
+    ASTAP.str1 w/o create-file ( file-id IOR ) if exit then -> fid_O          
+	begin
+		ASTAP.buf0 dup 256 fid_I ( c-addr c-addr u1 fileid) read-line ( c-addr u2 flag ior) drop
+	while
+		ASTAP.WCS-to-ALPT 0= if fid_O write-line drop then
+	repeat   
+	2drop
+	fid_I close-file drop
+	fid_O close-file drop 
+	ASTAP.str1 0
 ;
 
 \ Invoke PowerShell scripts to run ASTAP
@@ -103,7 +136,7 @@ s" " $value ASTAP.reported.Pierside$
 ;
 
 : ASTAP.solveFolder ( caddr u -- IOR)
-\ Take a folder path, invoke ASTAP for each image (.xisf or .fits) in that folder
+\ Take a folder path, invoke ASTAP for each .fits image in that folder
 \ List the created .wcs files in WCS-LIST.txt
 \ Return an IOR = 0 if the process completed successfully (regardless of how many of the images were successfully solved)
     s" pwsh.exe -File E:\coding\ForthASTAP\PowerShell\ASTAPRunFolder.PS1  " $-> ASTAP.str0
@@ -127,9 +160,19 @@ s" " $value ASTAP.reported.Pierside$
     else -1 then
 ;
 
+: astap.findfocus ( caddr u -- errlevel focuspos 0 | IOR)
+\ Take a folder path, invoke ASTAP to find the focus of the .fits images in that folder
+    s" pwsh.exe -File E:\coding\ForthASTAP\PowerShell\ASTAPFocus.PS1  " $-> ASTAP.str0
+    2dup $+> ASTAP.str0
+    ASTAP.str0 ShellCmd
+    ( caddr u) $-> ASTAP.str1 s" \exitcode.txt" $+> ASTAP.str1
+    ASTAP.str1 ASTAP.waitForFile if 2drop -1 exit then       \ no exitcode.txt file was produced    
+    ASTAP.str1 ASTAP.readFocus 
+;
+
+: platesolve ( caddr u -- RA DEC 0  | IOR )
 \ Invoke ASTAP Astrometry Stacking Program to plate solve an image
 \ 	take the full file path of the image 
-\ 	return the RA and DEC as single integer finite fractions or an IOR on failure
-: platesolve ( caddr u -- RA DEC 0  | IOR )
+\ 	return the RA and DEC as single integer finite fractions or an IOR on failure       
 	ASTAP.solveFile 
 ;
