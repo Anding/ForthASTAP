@@ -14,6 +14,7 @@ s" " $value ASTAP.str1
 0 value ASTAP.reported.RA
 0 value ASTAP.reported.Dec
 0 value ASTAP.reported.Sidereal
+0 value ASTAP.reported.NightOf
 s" " $value ASTAP.reported.Pierside$
 
 \ compute a hash h1 by hashing x1 and h0
@@ -47,6 +48,7 @@ s" " $value ASTAP.reported.Pierside$
 		602712226   ( "OBJCTDEC") of drop 10 + 10 >number~ -> ASTAP.reported.Dec        endof  
 		-1898806661 ( "SIDEREAL") of drop 10 + 10 >number~ -> ASTAP.reported.Sidereal   endof
 		1151949815  ( "PIERSIDE") of drop 10 + 1          $-> ASTAP.reported.Pierside$  endof
+		300196965   ( "NIGHTOF ") of drop 10 + 12 >number~ -> ASTAP.reported.NightOf    endof
 	    nip nip 
 	endcase
 	repeat   

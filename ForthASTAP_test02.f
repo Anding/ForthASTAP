@@ -10,4 +10,5 @@ ASTAP.solved.Dec            cr .Dec
 ASTAP.reported.RA           cr .RA
 ASTAP.reported.Dec          cr .Dec
 ASTAP.reported.Sidereal     cr .RA
+ASTAP.reported.NightOf      cr ~.
 ASTAP.reported.Pierside$    cr type  
