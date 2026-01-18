@@ -15,7 +15,6 @@ $xisfFiles = Get-ChildItem -LiteralPath $target.FullName -Filter '*.fits' | Sort
 
 # Handle the case where no .fits files are found.
 if ($xisfFiles.Count -eq 0) {
-    Write-Error "No .fits files found in $($target.FullName)."
     $exitCodePath = Join-Path $target.FullName 'exitcode.txt'
     '0' | Out-File -FilePath $exitCodePath -Encoding ASCII
     exit 1
@@ -40,9 +39,7 @@ $process = Start-Process -FilePath 'ASTAP.exe' `
     -WorkingDirectory $target.FullName `
     -NoNewWindow `
     -Wait `
-    -PassThru `
-    -RedirectStandardOutput $logFile `
-    -RedirectStandardError $errorFile
+    -PassThru
 
 # Write the exit code back to exitcode.txt inside the target folder.
 $exitCode = $process.ExitCode

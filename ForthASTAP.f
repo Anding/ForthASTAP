@@ -130,7 +130,7 @@ s" " $value ASTAP.reported.Pierside$
 
 : ASTAP.waitForFile ( caddr u -- IOR)
 \ Wait for creation of a file and return an IOR
-	200 0 do			\ 20 second timeout
+	200 0 do			\ 200 second timeout
 		2dup FileExists? if unloop 2drop 0 exit then
 		100 ms
 	loop
