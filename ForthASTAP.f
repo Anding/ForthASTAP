@@ -128,9 +128,9 @@ s" " $value ASTAP.reported.Pierside$
 
 \ Invoke PowerShell scripts to run ASTAP
 
-: ASTAP.waitForFile ( caddr u -- IOR)
+: ASTAP.waitForFile ( caddr u timeout -- IOR)
 \ Wait for creation of a file and return an IOR
-	200 0 do			\ 200 second timeout
+	10 * 0 do			\  timeout loop
 		2dup FileExists? if unloop 2drop 0 exit then
 		100 ms
 	loop
@@ -145,7 +145,7 @@ s" " $value ASTAP.reported.Pierside$
     2dup $+> ASTAP.str0
     ASTAP.str0 ShellCmd
     ( caddr u) $-> ASTAP.str1 s" \WCS-LIST.txt" $+> ASTAP.str1
-    ASTAP.str1 ASTAP.waitForFile
+    ASTAP.str1 180 ASTAP.waitForFile
 ;
 
 : ASTAP.solveFile ( caddr u -- RA DEC 0  | -1 )
@@ -155,7 +155,7 @@ s" " $value ASTAP.reported.Pierside$
     2dup $+> ASTAP.str0
     ASTAP.str0 ShellCmd
     2dup 4 - ( caddr u') $-> ASTAP.str1 s" ini" $+> ASTAP.str1
-    ASTAP.str1 ASTAP.waitForFile if 2drop -1 exit then       \ no ini file was produced
+    ASTAP.str1 10 ASTAP.waitForFile if -1 exit then       \ no ini file was produced
     4 - ( caddr u') $-> ASTAP.str1 s" wcs" $+> ASTAP.str1
     ASTAP.str1 ASTAP.readWCS 0= if
         ASTAP.solved.RA ASTAP.solved.Dec 0
@@ -168,7 +168,7 @@ s" " $value ASTAP.reported.Pierside$
     2dup $+> ASTAP.str0
     ASTAP.str0 ShellCmd
     ( caddr u) $-> ASTAP.str1 s" \exitcode.txt" $+> ASTAP.str1
-    ASTAP.str1 ASTAP.waitForFile if 2drop -1 exit then       \ no exitcode.txt file was produced    
+    ASTAP.str1 180 ASTAP.waitForFile if -1 exit then       \ no exitcode.txt file was produced    
     ASTAP.str1 ASTAP.readFocus 
 ;
 
