@@ -1,6 +1,7 @@
 need forthbase
 need finiteFractions
 need forth-map   
+need astrocalc
     
 \ a string values and buffers to construct command and output strings and read inputs
 s" " $value ASTAP.str0      
@@ -89,13 +90,16 @@ s" " $value ASTAP.reported.Pierside$
  ; 
 
 : ASTAP.formatALPT ( -- caddr u)
-\ Take the global plate parameters, convert to JNOW and format the 10u :newaslpt command string ready for execution
+\ Take the global plate parameters and format the 10u :newaslpt command string ready for execution
+\ reported coordinates and solved coordinates are converted from JNOW to J2000
     s\" s\" " $-> ASTAP.str0
-    ASTAP.reported.RA 10u.~RA$ $+> ASTAP.str0       s" ," $+> ASTAP.str0
-    ASTAP.reported.Dec 10u.~Dec$ $+> ASTAP.str0     s" ," $+> ASTAP.str0  
+    ASTAP.reported.RA ASTAP.reported.Dec ASTAP.reported.NightOf JNOW ( RA_JNOQ Dec_JNOW) swap
+    10u.~RA$ $+> ASTAP.str0                         s" ," $+> ASTAP.str0   
+    10u.~Dec$ $+> ASTAP.str0                        s" ," $+> ASTAP.str0      
     ASTAP.reported.Pierside$ $+> ASTAP.str0         s" ," $+> ASTAP.str0
-    ASTAP.solved.RA 10u.~RA$ $+> ASTAP.str0         s" ," $+> ASTAP.str0
-    ASTAP.solved.Dec 10u.~Dec$ $+> ASTAP.str0       s" ," $+> ASTAP.str0   
+    ASTAP.solved.RA ASTAP.solved.Dec ASTAP.reported.NightOf JNOW ( RA_JNOQ Dec_JNOW) swap
+    10u.~RA$ $+> ASTAP.str0                         s" ," $+> ASTAP.str0
+    10u.~Dec$ $+> ASTAP.str0                        s" ," $+> ASTAP.str0   
     ASTAP.reported.Sidereal  10u.~RA$ $+> ASTAP.str0  
     s\" \" 10u.AddAlignmentPoint" $+> ASTAP.str0  
     ASTAP.str0         
@@ -110,6 +114,7 @@ s" " $value ASTAP.reported.Pierside$
 : ASTAP.folder-to-ALPT { caddr1 u1 | fid_I fid_O -- caddr2 u2 0 | IOR }
 \ caddr1 u1 specifics a folder containing a WCS-LIST.txt file
 \ caddr2 u2 specifics a resultant output file listing 
+    caddr1 u1 + 1- c@ '\' = if u1 1- -> u1 then   \ remove any trailing '\'
     caddr1 u1 $-> ASTAP.str0 s" \WCS-LIST.txt" $+> ASTAP.str0
     caddr1 u1 $-> ASTAP.str1 s" \10Umodel.f" $+> ASTAP.str1   
     ASTAP.str0 r/o open-file ( file-id IOR ) if exit then -> fid_I
