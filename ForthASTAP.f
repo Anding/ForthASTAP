@@ -101,7 +101,7 @@ s" " $value ASTAP.reported.Pierside$
     10u.~RA$ $+> ASTAP.str0                         s" ," $+> ASTAP.str0
     10u.~Dec$ $+> ASTAP.str0                        s" ," $+> ASTAP.str0   
     ASTAP.reported.Sidereal  10u.~RA$ $+> ASTAP.str0  
-    s\" \" 10u.AddAlignmentPoint" $+> ASTAP.str0  
+    s\" \" add-alignment-point" $+> ASTAP.str0  
     ASTAP.str0         
 ;
 
