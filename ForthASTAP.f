@@ -135,6 +135,7 @@ s" " $value ASTAP.reported.Pierside$
 
 : ASTAP.waitForFile ( caddr u timeout -- IOR)
 \ Wait for creation of a file and return an IOR
+\ timeout in seconds
 	10 * 0 do			\  timeout loop
 		2dup FileExists? if unloop 2drop 0 exit then
 		100 ms
@@ -160,7 +161,7 @@ s" " $value ASTAP.reported.Pierside$
     2dup $+> ASTAP.str0
     ASTAP.str0 ShellCmd
     2dup 4 - ( caddr u') $-> ASTAP.str1 s" ini" $+> ASTAP.str1
-    ASTAP.str1 10 ASTAP.waitForFile if -1 exit then       \ no ini file was produced
+    ASTAP.str1 45 ASTAP.waitForFile if -1 exit then       \ no ini file was produced
     4 - ( caddr u') $-> ASTAP.str1 s" wcs" $+> ASTAP.str1
     ASTAP.str1 ASTAP.readWCS 0= if
         ASTAP.solved.RA ASTAP.solved.Dec 0

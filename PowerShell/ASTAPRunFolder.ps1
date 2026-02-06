@@ -46,7 +46,7 @@ $files = Get-ChildItem -Path $FOLDER -File |
     Sort-Object Name
 
 # Maximum time to wait for the .ini sidecar (seconds) and polling interval (ms).
-$timeoutSeconds = 10
+$timeoutSeconds = 30
 $pollMilliseconds = 200
 
 # Process each file in turn. Direct invocation of `astap` is synchronous.
