@@ -45,10 +45,10 @@ s" " $value ASTAP.reported.Pierside$
 		    fp~ -> ASTAP.solved.RA    
 		endof
 		1035616990  ( "CRVAL2  ") of drop 10 + 20 >float drop fp~ -> ASTAP.solved.Dec   endof
-		602714565   ( "OBJCTRA ") of drop 10 + 10 >number~ -> ASTAP.reported.RA         endof
-		602712226   ( "OBJCTDEC") of drop 10 + 10 >number~ -> ASTAP.reported.Dec        endof  
-		-1898806661 ( "SIDEREAL") of drop 10 + 10 >number~ -> ASTAP.reported.Sidereal   endof
-		1151949815  ( "PIERSIDE") of drop 10 + 1          $-> ASTAP.reported.Pierside$  endof
+		602714565   ( "OBJCTRA ") of drop 11 + 10 >number~ -> ASTAP.reported.RA         endof
+		602712226   ( "OBJCTDEC") of drop 11 + 10 >number~ -> ASTAP.reported.Dec        endof  
+		-1898806661 ( "SIDEREAL") of drop 11 + 10 >number~ -> ASTAP.reported.Sidereal   endof
+		1151949815  ( "PIERSIDE") of drop 11 + 1          $-> ASTAP.reported.Pierside$  endof
 		300196965   ( "NIGHTOF ") of drop 10 + 12 >number~ -> ASTAP.reported.NightOf    endof
 	    nip nip 
 	endcase

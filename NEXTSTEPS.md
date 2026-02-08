@@ -1,5 +1,5 @@
 ## Next steps for ForthASTAP
 
-1. Test and further refine in practical use
+1. Write explicit conversion routines to extract FITS keys and values, and remove ' '
 
-2. Utilize JNOW <> J2000 conversions in AstroCalc
+2. Adjust scanning of WCS files using explicit conversion words
