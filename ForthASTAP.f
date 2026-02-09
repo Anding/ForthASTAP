@@ -18,27 +18,13 @@ s" " $value ASTAP.str1
 0 value ASTAP.reported.NightOf
 s" " $value ASTAP.reported.Pierside$
 
-\ compute a hash h1 by hashing x1 and h0
-\ 	borrowed from simple-tester and used in scanning a .wcs file
-: ASTAP.hash ( x1 h0 -- h1)
-	31 * swap 13 + xor
-;	
-	
-\ hash a string to a single value on stack
-: ASTAP.hash$ ( c-addr u -- h)
-	swap 2dup + swap ( u end+1 start)
-	?do											\ Let h0 = u
-		i c@ ( h_i x) swap ASTAP.hash ( h_j) 	\ j = i + 1
-	loop
-;
-
 : ASTAP.readWCS ( caddr u  -- IOR)
 \ read a WCS file and populate the ForthASTAP globals with the relevant FITS values
     r/o open-file ( file-id IOR ) if exit then >R
 	begin
 		ASTAP.buf0 dup 256 R@ ( c-addr c-addr u1 fileid) read-line ( c-addr u2 flag ior) drop
 	while
-		2dup drop 8 ASTAP.hash$ ( c-addr u2 h)
+		2dup drop 8 hash$ ( c-addr u2 h)
 	case
 		1035617187  ( "CRVAL1  ") of                
 		    drop 10 + 20 >float drop 1.5E1 f/   \ CRVAL1 reports RA in degrees
