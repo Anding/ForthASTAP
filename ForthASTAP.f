@@ -2,11 +2,14 @@ need forthbase
 need finiteFractions
 need forth-map   
 need astrocalc
+need ForthXISF
+need FITS_load
     
 \ a string values and buffers to construct command and output strings and read inputs
 s" " $value ASTAP.str0      
 s" " $value ASTAP.str1
 256 buffer: ASTAP.buf0
+FILEPATH_SIZE allocate-buffer constant ASTAP.tempFITSpath
 
 \ Global values obtained from scanning the ASTAP WCS file
 \   finite fraction single integer format, J2000 as read from the FITS file
@@ -153,6 +156,69 @@ s" " $value ASTAP.reported.Pierside$
         ASTAP.solved.RA ASTAP.solved.Dec 0
     else -1 then
 ;
+
+: ASTAP.wcs-filepath ( caddr u -- caddr u)
+\ replace the .fits extension with .wcs
+    4 - $-> ASTAP.str1
+    s" wcs" $+> ASTAP.str1
+    ASTAP.str1
+;
+
+: ASTAP.temp-FITSfilepath { img | filepath-buffer -- filepath-buffer }
+\ create a per-image temporary solver filepath in the configured working root
+    ASTAP.tempFITSpath -> filepath-buffer
+    filepath-buffer reset-buffer
+    s" E:\images\working\" filepath-buffer write-buffer drop
+    img FITS_MAP @ s" UUID" >string filepath-buffer write-buffer drop
+    '\' filepath-buffer echo-buffer drop
+    filepath-buffer buffer-punctuate-filepath
+    s" solve.fits" filepath-buffer write-buffer drop
+    filepath-buffer
+;
+
+: ASTAP.import-WCS { caddr u img | fileid -- IOR }
+\ merge all ordinary WCS FITS cards into the image context's ordered map
+    caddr u r/o open-file if exit then -> fileid
+    begin
+        ASTAP.buf0 80 fileid read-file abort" Cannot read ASTAP WCS file"
+        80 =
+    while
+        ASTAP.buf0 80 XISF.read-FITSline
+        dup 0= if
+            drop img FITS_MAP @ =>
+        else
+            drop
+        then
+    repeat
+    fileid close-file drop
+    0
+;
+
+: ASTAP.solve-image { img | filepath-buffer -- solved? }
+\ solve an image context and append successful solution data to its FITS map
+    img ASTAP.temp-FITSfilepath -> filepath-buffer
+    img filepath-buffer save-FITSimage-to
+    filepath-buffer buffer-to-string ASTAP.solveFile
+    dup 0= if
+        drop 2drop
+        filepath-buffer buffer-to-string ASTAP.wcs-filepath img ASTAP.import-WCS
+        if
+            s" FAILED" img FITS_MAP @ =>" SOLVSTAT"
+            -1 exit
+        then
+        s" ASTAP" img FITS_MAP @ =>" SOLVER"
+        s" SOLVED" img FITS_MAP @ =>" SOLVSTAT"
+        ASTAP.formatALPT img FITS_MAP @ =>" 10UALPT"
+        0
+    else
+        drop
+        s" FAILED" img FITS_MAP @ =>" SOLVSTAT"
+        -1
+    then
+;
+
+DEFER solve-image ( img -- solved? )
+ASSIGN ASTAP.solve-image TO-DO solve-image
 
 : astap.findfocus ( caddr u -- errlevel focuspos 0 | IOR)
 \ Take a folder path, invoke ASTAP to find the focus of the .fits images in that folder
