@@ -12,6 +12,20 @@ astrometric solver and autofocus support.
 - `ForthXISF` provides FITS creation, FITS-card parsing, and the shared image
   context used by the solver.
 
+## Compile-time selection
+
+ASTAP is the default solver in AstroImagingInForth. In a fresh VFXterm
+session, load:
+
+```forth
+include scripts\AstroImagingInForth.f
+```
+
+The integration script loads ForthASTAP when `solve-image` has not already
+been defined. To select ForthSeiza instead, restart VFXterm and load
+ForthSeiza before the integration script; see the ForthSeiza README. Selection
+is compile-time, so do not load both solver packages in one VFX session.
+
 ## Context solver contract
 
 `solve-image` is a deferred word with the default assignment:
