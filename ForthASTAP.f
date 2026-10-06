@@ -152,6 +152,7 @@ s" " $value ASTAP.reported.Pierside$
     2dup 4 - ( caddr u') $-> ASTAP.str1 s" ini" $+> ASTAP.str1
     ASTAP.str1 45 ASTAP.waitForFile if -1 exit then       \ no ini file was produced
     4 - ( caddr u') $-> ASTAP.str1 s" wcs" $+> ASTAP.str1
+    ASTAP.str1 45 ASTAP.waitForFile if -1 exit then       \ no WCS file was produced
     ASTAP.str1 ASTAP.readWCS 0= if
         ASTAP.solved.RA ASTAP.solved.Dec 0
     else -1 then
