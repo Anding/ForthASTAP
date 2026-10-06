@@ -169,29 +169,31 @@ s" " $value ASTAP.reported.Pierside$
     ASTAP.tempFITSpath -> filepath-buffer
     filepath-buffer reset-buffer
     s" E:\images\working\" filepath-buffer write-buffer drop
-    img FITS_MAP @ s" UUID" >string filepath-buffer write-buffer drop
+    s" UUID" img FITS_MAP @ >string filepath-buffer write-buffer drop
     '\' filepath-buffer echo-buffer drop
     filepath-buffer buffer-punctuate-filepath
     s" solve.fits" filepath-buffer write-buffer drop
     filepath-buffer
 ;
 
-: ASTAP.import-WCS { caddr u img | fileid -- IOR }
+: ASTAP.import-WCS ( caddr u img -- )
 \ merge all ordinary WCS FITS cards into the image context's ordered map
-    caddr u r/o open-file if exit then -> fileid
+    dup FITS_MAP @ >R drop
+    r/o open-file >R >R 2drop R> R>
+    dup if nip R> drop exit then drop >R
     begin
-        ASTAP.buf0 80 fileid read-file abort" Cannot read ASTAP WCS file"
-        80 =
+        \ ASTAP emits CRLF-terminated 80-character FITS cards.
+        ASTAP.buf0 80 R@ read-line abort" Cannot read ASTAP WCS file"
     while
-        ASTAP.buf0 80 XISF.read-FITSline
+        ASTAP.buf0 swap XISF.read-FITSline
         dup 0= if
-            drop img FITS_MAP @ =>
+            drop 2R@ drop =>
         else
             drop
         then
     repeat
-    fileid close-file drop
-    0
+    R> close-file drop
+    R> drop
 ;
 
 : ASTAP.solve-image { img | filepath-buffer -- solved? }
@@ -202,10 +204,6 @@ s" " $value ASTAP.reported.Pierside$
     dup 0= if
         drop 2drop
         filepath-buffer buffer-to-string ASTAP.wcs-filepath img ASTAP.import-WCS
-        if
-            s" FAILED" img FITS_MAP @ =>" SOLVSTAT"
-            -1 exit
-        then
         s" ASTAP" img FITS_MAP @ =>" SOLVER"
         s" SOLVED" img FITS_MAP @ =>" SOLVSTAT"
         ASTAP.formatALPT img FITS_MAP @ =>" 10UALPT"
