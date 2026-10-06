@@ -176,24 +176,22 @@ s" " $value ASTAP.reported.Pierside$
     filepath-buffer
 ;
 
-: ASTAP.import-WCS ( caddr u img -- )
+ : ASTAP.import-WCS { caddr u img | map fileid -- }
 \ merge all ordinary WCS FITS cards into the image context's ordered map
-    dup FITS_MAP @ >R drop
-    r/o open-file >R >R 2drop R> R>
-    dup if nip R> drop exit then drop >R
+    img FITS_MAP @ -> map
+    caddr u r/o open-file abort" Cannot open ASTAP WCS file" -> fileid
     begin
-        \ ASTAP emits CRLF-terminated 80-character FITS cards.
-        ASTAP.buf0 80 R@ read-line abort" Cannot read ASTAP WCS file"
+        ASTAP.buf0 255 fileid read-line abort" Cannot read ASTAP WCS file"
     while
         ASTAP.buf0 swap XISF.read-FITSline
         dup 0= if
-            drop 2R@ drop =>
+            drop map =>
         else
             drop
         then
     repeat
-    R> close-file drop
-    R> drop
+    drop
+    fileid close-file abort" Cannot close ASTAP WCS file"
 ;
 
 : ASTAP.solve-image { img | filepath-buffer -- solved? }
