@@ -3,7 +3,7 @@
 need ForthASTAP
 need simple-tester
 
-4 3 1 allocate-image constant wcs.image
+4 3 1 allocate-frame constant wcs.image
 
 : ASTAP.fixture-geometry ( caddr u -- width height depth )
     xisf.open-FITSfile abort" Cannot open ASTAP fixture" >R
@@ -30,10 +30,10 @@ T{ s" E:\images\tests\astap\known-good\LUM-E8-F5100-12365844e78a.fits"
 T{ s" E:\images\tests\astap\known-good\LUM-E8-F5100-12365844e78a.wcs"
    wcs.image ASTAP.import-WCS
 }T ==
-T{ s" CRVAL1" wcs.image FITS_MAP @ >string nip 0> }T -1 ==
-T{ s" CTYPE1" wcs.image FITS_MAP @ >string drop 8 hashS }T s" RA---TAN" hashS ==
+T{ s" CRVAL1" wcs.image FRAME_METADATA @ >string nip 0> }T -1 ==
+T{ s" CTYPE1" wcs.image FRAME_METADATA @ >string drop 8 hashS }T s" RA---TAN" hashS ==
 
 Tend
 
-wcs.image free-image
+wcs.image free-frame
 bye

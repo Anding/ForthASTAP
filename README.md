@@ -9,8 +9,8 @@ astrometric solver and autofocus support.
 - PowerShell (`pwsh.exe`) must be available.
 - The bundled PowerShell scripts are invoked from
   `E:\coding\ForthASTAP\PowerShell`.
-- `ForthXISF` provides FITS creation, FITS-card parsing, and the shared image
-  context used by the solver.
+- `ForthAstroFormats` provides the format-neutral frame, FITS creation, and
+  FITS-card parsing used by the solver. It does not load XISF or image loaders.
 
 ## Compile-time selection
 

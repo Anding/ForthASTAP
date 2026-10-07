@@ -2,8 +2,7 @@ need forthbase
 need finiteFractions
 need forth-map   
 need astrocalc
-need ForthXISF
-need FITS_load
+need ForthAstroFormats
     
 \ a string values and buffers to construct command and output strings and read inputs
 s" " $value ASTAP.str0      
@@ -170,7 +169,7 @@ s" " $value ASTAP.reported.Pierside$
     ASTAP.tempFITSpath -> filepath-buffer
     filepath-buffer reset-buffer
     s" E:\images\working\" filepath-buffer write-buffer drop
-    s" UUID" img FITS_MAP @ >string filepath-buffer write-buffer drop
+    s" UUID" img FRAME_METADATA @ >string filepath-buffer write-buffer drop
     '\' filepath-buffer echo-buffer drop
     filepath-buffer buffer-punctuate-filepath
     s" solve.fits" filepath-buffer write-buffer drop
@@ -179,12 +178,12 @@ s" " $value ASTAP.reported.Pierside$
 
  : ASTAP.import-WCS { caddr u img | map fileid -- }
 \ merge all ordinary WCS FITS cards into the image context's ordered map
-    img FITS_MAP @ -> map
+    img FRAME_METADATA @ -> map
     caddr u r/o open-file abort" Cannot open ASTAP WCS file" -> fileid
     begin
         ASTAP.buf0 255 fileid read-line abort" Cannot read ASTAP WCS file"
     while
-        ASTAP.buf0 swap XISF.read-FITSline
+        ASTAP.buf0 swap FITS.read-line
         dup 0= if
             drop map =>
         else
@@ -203,13 +202,13 @@ s" " $value ASTAP.reported.Pierside$
     dup 0= if
         drop 2drop
         filepath-buffer buffer-to-string ASTAP.wcs-filepath img ASTAP.import-WCS
-        s" ASTAP" img FITS_MAP @ =>" SOLVER"
-        s" SOLVED" img FITS_MAP @ =>" SOLVSTAT"
-        ASTAP.formatALPT img FITS_MAP @ =>" 10UALPT"
+        s" ASTAP" img FRAME_METADATA @ =>" SOLVER"
+        s" SOLVED" img FRAME_METADATA @ =>" SOLVSTAT"
+        ASTAP.formatALPT img FRAME_METADATA @ =>" 10UALPT"
         0
     else
         drop
-        s" FAILED" img FITS_MAP @ =>" SOLVSTAT"
+        s" FAILED" img FRAME_METADATA @ =>" SOLVSTAT"
         -1
     then
 ;
