@@ -1,6 +1,7 @@
 \ Integration coverage for known-good ASTAP fixture images.
 
 need ForthASTAP
+need ForthImageLoaders
 need simple-tester
 
 4 3 1 allocate-frame constant wcs.image
@@ -28,7 +29,7 @@ T{ s" E:\images\tests\astap\known-good\LUM-E8-F5100-12365844e78a.fits"
    ASTAP.fixture-solved?
 }T -1 ==
 T{ s" E:\images\tests\astap\known-good\LUM-E8-F5100-12365844e78a.wcs"
-   wcs.image ASTAP.import-WCS
+   wcs.image solver.import-WCS
 }T ==
 T{ s" CRVAL1" wcs.image FRAME_METADATA @ >string nip 0> }T -1 ==
 T{ s" CTYPE1" wcs.image FRAME_METADATA @ >string drop 8 hashS }T s" RA---TAN" hashS ==
