@@ -1,13 +1,9 @@
-need forthbase
+need ForthASTAPFocus
 need finiteFractions
 need forth-map   
 need astrocalc
 need ForthAstroFormats
     
-\ a string values and buffers to construct command and output strings and read inputs
-s" " $value ASTAP.str0      
-s" " $value ASTAP.str1
-256 buffer: ASTAP.buf0
 FILEPATH_SIZE allocate-buffer constant ASTAP.tempFITSpath
 
 \ Global values obtained from scanning the ASTAP WCS file
@@ -43,26 +39,6 @@ s" " $value ASTAP.reported.Pierside$
 	repeat   
 	drop drop
 	R> close-file drop 0
-;
-
-: ASTAP.readFocus ( addr u -- errlevel focuspos 0 | IOR)
-\ read the exitcode.txt file produced by ASTAPFocus.PS1 and report focus position and error level
-    r/o open-file ( file-id IOR ) if exit then >R       \ open-file failed
-    ASTAP.buf0 dup 256 R> ( c-addr c-addr u1 fileid) read-line ( c-addr u2 flag ior) drop
-    if isInteger? 1 = 
-        if
-            10000 /MOD ( errlevel focuspos)
-            dup 0= if
-                2drop -1 exit       \ ASTAP ran but focus not found
-            else
-                0 exit              \ ASTAP ran and focus was found
-            then
-        else 
-            -1 exit                 \ the text is not an integer
-        then 
-    else
-        2drop -1 exit               \ file is empty
-    then  
 ;
 
 : 10u.~Dec$ ( deg-min-sec -- caddr u)
@@ -117,18 +93,6 @@ s" " $value ASTAP.reported.Pierside$
 	fid_I close-file drop
 	fid_O close-file drop 
 	ASTAP.str1 0
-;
-
-\ Invoke PowerShell scripts to run ASTAP
-
-: ASTAP.waitForFile ( caddr u timeout -- IOR)
-\ Wait for creation of a file and return an IOR
-\ timeout in seconds
-	10 * 0 do			\  timeout loop
-		2dup FileExists? if unloop 2drop 0 exit then
-		100 ms
-	loop
-	2drop -1
 ;
 
 : ASTAP.solveFolder ( caddr u -- IOR)
@@ -215,16 +179,6 @@ s" " $value ASTAP.reported.Pierside$
 
 DEFER solve-image ( img -- solved? )
 ASSIGN ASTAP.solve-image TO-DO solve-image
-
-: astap.findfocus ( caddr u -- errlevel focuspos 0 | IOR)
-\ Take a folder path, invoke ASTAP to find the focus of the .fits images in that folder
-    s" pwsh.exe -File E:\coding\ForthASTAP\PowerShell\ASTAPFocus.PS1  " $-> ASTAP.str0
-    2dup $+> ASTAP.str0
-    ASTAP.str0 ShellCmd
-    ( caddr u) $-> ASTAP.str1 s" \exitcode.txt" $+> ASTAP.str1
-    ASTAP.str1 180 ASTAP.waitForFile if -1 exit then       \ no exitcode.txt file was produced    
-    ASTAP.str1 ASTAP.readFocus 
-;
 
 : platesolve ( caddr u -- RA DEC 0  | IOR )
 \ Invoke ASTAP Astrometry Stacking Program to plate solve an image

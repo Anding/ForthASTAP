@@ -1,7 +1,14 @@
 # ForthASTAP
 
 Forth integration for the [ASTAP](https://www.hnsky.org/astap.htm)
-astrometric solver and autofocus support.
+autofocus and optional astrometric solver.
+
+The capabilities are deliberately separate:
+
+| Package | Purpose | Defines `solve-image` |
+|---|---|---|
+| `ForthASTAPFocus` | `astap.findfocus` and shared subprocess helpers | No |
+| `ForthASTAP` | Complete ASTAP astrometry plus autofocus | Yes |
 
 ## Prerequisites
 
@@ -12,19 +19,34 @@ astrometric solver and autofocus support.
 - `ForthAstroFormats` provides the format-neutral frame, FITS creation, and
   FITS-card parsing used by the solver. It does not load XISF or image loaders.
 
-## Compile-time selection
+## Autofocus
 
-ASTAP is the default solver in AstroImagingInForth. In a fresh VFXterm
-session, load:
+AstroImagingInForth loads the focus-only capability in ordinary sessions:
 
 ```forth
-include scripts\AstroImagingInForth.f
+NEED ForthASTAPFocus
 ```
 
-The integration script loads ForthASTAP when `solve-image` has not already
-been defined. To select ForthSeiza instead, restart VFXterm and load
-ForthSeiza before the integration script; see the ForthSeiza README. Selection
-is compile-time, so do not load both solver packages in one VFX session.
+This supplies:
+
+```forth
+astap.findfocus ( caddr u -- errlevel focuspos 0 | IOR )
+```
+
+without loading frame/FITS code or changing the selected imaging solver.
+
+## Optional ASTAP solver selection
+
+Seiza is the AstroImagingInForth default. To use ASTAP for astrometry in a
+fresh VFXterm session, load the complete package before the integration:
+
+```forth
+NEED ForthASTAP
+include scripts\HomeObservatory.f
+```
+
+The existing `solve-image` definition prevents the integration from loading
+Seiza. Solver selection remains compile-time.
 
 ## Context solver contract
 
@@ -76,6 +98,10 @@ observable result is the augmented ordered FITS map.
 ```
 
 ## Tests
+
+`ForthASTAPFocus_dependency_test1.f` verifies that the autofocus package
+provides focus parsing without loading frame formats or defining
+`solve-image`.
 
 `ForthASTAP_fixture_test1.f` uses verified real FITS fixtures beneath:
 
