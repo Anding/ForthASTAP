@@ -1,3 +1,6 @@
+\ Interactive ASTAP numeric-formatting scratchpad. This file performs work at
+\ top level and is not a reusable library or automated regression.
+
 need finiteFractions
 
 \ values presented in the .ini file are parsed as floating point numbers by VFX Forth

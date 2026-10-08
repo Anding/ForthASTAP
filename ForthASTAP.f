@@ -1,3 +1,6 @@
+\ ASTAP process adapter for the shared solve-image contract. ASTAP-specific
+\ solved coordinates remain here; WCS import and alignment metadata are shared.
+
 need ForthASTAPFocus
 need ForthAstroSolver
 need ForthAstroPaths
