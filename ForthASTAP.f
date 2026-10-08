@@ -1,5 +1,6 @@
 need ForthASTAPFocus
 need ForthAstroSolver
+need ForthAstroPaths
     
 FILEPATH_SIZE allocate-buffer constant ASTAP.tempFITSpath
 
@@ -65,7 +66,8 @@ FILEPATH_SIZE allocate-buffer constant ASTAP.tempFITSpath
 \ create a per-image temporary solver filepath in the configured working root
     ASTAP.tempFITSpath -> filepath-buffer
     filepath-buffer reset-buffer
-    s" E:\images\working\" filepath-buffer write-buffer drop
+    astro.working-root filepath-buffer write-buffer drop
+    '\' filepath-buffer echo-buffer drop
     s" UUID" img FRAME_METADATA @ >string filepath-buffer write-buffer drop
     '\' filepath-buffer echo-buffer drop
     filepath-buffer buffer-punctuate-filepath
