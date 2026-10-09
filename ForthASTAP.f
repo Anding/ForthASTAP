@@ -82,10 +82,10 @@ FILEPATH_SIZE allocate-buffer constant ASTAP.tempFITSpath
 
 : ASTAP.save-temp-FITS { img | saved-path ior -- }
 \ Temporarily replace FITS pathname policy while writing the solver image.
-    ACTION-OF write-filepath -> saved-path
-    ASSIGN ASTAP.write-temp-FITSfilepath TO-DO write-filepath
-    img ASTAP.tempFITSpath ['] save-FITSimage catch -> ior
-    saved-path TO-DO write-filepath
+    ACTION-OF write-filepath-fits -> saved-path
+    ASSIGN ASTAP.write-temp-FITSfilepath TO-DO write-filepath-fits
+    img ASTAP.tempFITSpath ['] save-FITSframe-to catch -> ior
+    saved-path TO-DO write-filepath-fits
     ior ?dup if throw then
 ;
 

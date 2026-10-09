@@ -15,8 +15,8 @@ NEED ForthASTAP
     suffix-addr suffix-u filepath-buffer write-buffer drop
 ;
 
-ASSIGN ASTAP.path-test-FITS TO-DO write-filepath
-ACTION-OF write-filepath constant ASTAP.path-test.saved-action
+ASSIGN ASTAP.path-test-FITS TO-DO write-filepath-fits
+ACTION-OF write-filepath-fits constant ASTAP.path-test.saved-action
 
 test.make-frame -> ASTAP.path-test.frame
 s" 11111111-2222-3333-4444-555555555555"
@@ -27,7 +27,7 @@ T{ ASTAP.path-test.frame ASTAP.save-temp-FITS }T ==
 T{ ASTAP.tempFITSpath buffer-to-string hashS
 }T s" E:\images\working\11111111-2222-3333-4444-555555555555\solve.fits" hashS ==
 T{ ASTAP.tempFITSpath buffer-to-string FileExists? }T -1 ==
-T{ ACTION-OF write-filepath ASTAP.path-test.saved-action = }T -1 ==
+T{ ACTION-OF write-filepath-fits ASTAP.path-test.saved-action = }T -1 ==
 Tend
 
 ASTAP.tempFITSpath buffer-to-string delete-file drop
