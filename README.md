@@ -65,7 +65,7 @@ Its stack effect is:
 It saves a temporary FITS image at:
 
 ```text
-<astro.working-root>\<UUID>\solve.fits
+<astro.root>\working\<UUID>\solve.fits
 ```
 
 and invokes ASTAP on that file.

@@ -6,12 +6,13 @@ NEED ForthASTAP
 
 0 value ASTAP.path-test.frame
 
-: ASTAP.path-test-science { frame filepath-buffer -- }
+: ASTAP.path-test-science { frame suffix-addr suffix-u filepath-buffer -- }
 \ Distinct caller policy used to prove ASTAP restores the previous action.
     frame drop
     filepath-buffer reset-buffer
     s" E:\Coding\ForthASTAP\caller-science"
         filepath-buffer write-buffer drop
+    suffix-addr suffix-u filepath-buffer write-buffer drop
 ;
 
 ASSIGN ASTAP.path-test-science TO-DO write-science-filepath
