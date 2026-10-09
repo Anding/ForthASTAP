@@ -70,6 +70,11 @@ It saves a temporary FITS image at:
 
 and invokes ASTAP on that file.
 
+The save temporarily assigns ASTAP's private pathname builder to
+`write-science-filepath`, then restores the previous default or user action
+before returning. Restoration also occurs when FITS writing throws, so solver
+work cannot redirect subsequent science XISF/FITS payloads.
+
 | Result | `solved?` | Context-map updates |
 | --- | --- | --- |
 | Solved | `0` | `SOLVER=ASTAP`, `SOLVSTAT=SOLVED`, imported WCS cards, `10UALPT` |

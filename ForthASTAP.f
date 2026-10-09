@@ -65,27 +65,33 @@ FILEPATH_SIZE allocate-buffer constant ASTAP.tempFITSpath
     ASTAP.str1
 ;
 
-: ASTAP.temp-FITSfilepath { img | filepath-buffer -- filepath-buffer }
-\ create a per-image temporary solver filepath in the configured working root
-    ASTAP.tempFITSpath -> filepath-buffer
+: ASTAP.write-temp-FITSfilepath { img filepath-buffer -- }
+\ Build the extension-free pathname stem for ASTAP's private solver image.
     filepath-buffer reset-buffer
     astro.working-root filepath-buffer write-buffer drop
     '\' filepath-buffer echo-buffer drop
     s" UUID" img FRAME_METADATA @ >string filepath-buffer write-buffer drop
     '\' filepath-buffer echo-buffer drop
     filepath-buffer buffer-punctuate-filepath
-    s" solve.fits" filepath-buffer write-buffer drop
-    filepath-buffer
+    s" solve" filepath-buffer write-buffer drop
 ;
 
-: ASTAP.solve-image { img | filepath-buffer -- solved? }
-\ solve an image context and append successful solution data to its FITS map
-    img ASTAP.temp-FITSfilepath -> filepath-buffer
-    img filepath-buffer save-FITSimage-to
-    filepath-buffer buffer-to-string ASTAP.solveFile
+: ASTAP.save-temp-FITS { img | saved-path ior -- }
+\ Temporarily replace science pathname policy while writing the solver FITS.
+    ACTION-OF write-science-filepath -> saved-path
+    ASSIGN ASTAP.write-temp-FITSfilepath TO-DO write-science-filepath
+    img ASTAP.tempFITSpath ['] save-FITSimage catch -> ior
+    saved-path TO-DO write-science-filepath
+    ior ?dup if throw then
+;
+
+: ASTAP.solve-image { img -- solved? }
+\ Save through private path policy, solve, and append solution data to the map.
+    img ASTAP.save-temp-FITS
+    ASTAP.tempFITSpath buffer-to-string ASTAP.solveFile
     dup 0= if
         drop 2drop
-        filepath-buffer buffer-to-string ASTAP.wcs-filepath
+        ASTAP.tempFITSpath buffer-to-string ASTAP.wcs-filepath
             img solver.import-WCS
         s" ASTAP" img FRAME_METADATA @ =>" SOLVER"
         s" SOLVED" img FRAME_METADATA @ =>" SOLVSTAT"
