@@ -71,7 +71,7 @@ It saves a temporary FITS image at:
 and invokes ASTAP on that file.
 
 The save temporarily assigns ASTAP's private filename creator to
-`write-filepath`, then restores the previous action
+`write-filepath-fits`, then restores the previous action
 before returning. Restoration also occurs when FITS writing throws, so solver
 work cannot redirect subsequent science XISF/FITS payloads.
 
