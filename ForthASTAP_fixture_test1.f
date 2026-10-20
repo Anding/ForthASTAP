@@ -31,10 +31,8 @@ T{ s" E:\images\tests\astap\known-good\LUM-E8-F5100-12365844e78a.fits"
 T{ s" E:\images\tests\astap\known-good\LUM-E8-F5100-12365844e78a.wcs"
    wcs.image solver.import-WCS
 }T ==
-T{ s" CRVAL1" wcs.image FRAME_METADATA @ >string nip 0> }T -1 ==
-T{ s" CTYPE1" wcs.image FRAME_METADATA @ >string drop 8 hashS }T s" RA---TAN" hashS ==
-
-Tend
+T{ s" CRVAL1" wcs.image FRAME_METADATA @ map@ nip 0> }T -1 ==
+T{ s" CTYPE1" wcs.image FRAME_METADATA @ map@ drop 8 hashS }T s" RA---TAN" hashS ==
 
 wcs.image free-frame
-bye
+Tend

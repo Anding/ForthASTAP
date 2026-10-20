@@ -4,6 +4,7 @@
 need ForthASTAPFocus
 need ForthAstroSolver
 need ForthAstroPaths
+need ordered-maps
     
 FILEPATH_SIZE allocate-buffer constant ASTAP.tempFITSpath
 
@@ -72,7 +73,7 @@ FILEPATH_SIZE allocate-buffer constant ASTAP.tempFITSpath
     astro.root filepath-buffer write-buffer drop
     s" working" filepath-buffer append-path
     '\' filepath-buffer echo-buffer drop
-    s" UUID" img FRAME_METADATA @ >string filepath-buffer write-buffer drop
+    s" UUID" img FRAME_METADATA @ map@ filepath-buffer write-buffer drop
     '\' filepath-buffer echo-buffer drop
     filepath-buffer buffer-punctuate-filepath
     s" solve" filepath-buffer write-buffer drop
