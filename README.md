@@ -82,8 +82,8 @@ work cannot redirect subsequent science XISF/FITS payloads.
 
 The caller owns the policy for a failed solve. AstroImagingInForth preserves
 and saves science XISF/FITS output on failure; it writes no WCS sidecar. On
-success, `10UALPT` is the formatted command passed directly to
-`add-alignment-point` by the live mount-model script.
+success, `10UALPT` contains comma-separated 10Micron alignment data, not Forth
+source. The live mount-model script passes it directly to `add-alignment-point`.
 
 ## WCS import
 
