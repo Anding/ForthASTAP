@@ -84,6 +84,9 @@ The caller owns the policy for a failed solve. AstroImagingInForth preserves
 and saves science XISF/FITS output on failure; it writes no WCS sidecar. On
 success, `10UALPT` contains comma-separated 10Micron alignment data, not Forth
 source. The live mount-model script passes it directly to `add-alignment-point`.
+ASTAP calls `solver.solved-metadata` after importing a successful solution;
+AstroImagingInForth binds this to generate `10UALPT` for every successful
+frame solve, not just model building.
 
 ## WCS import
 

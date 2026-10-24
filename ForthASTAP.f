@@ -100,6 +100,7 @@ FILEPATH_SIZE allocate-buffer constant ASTAP.tempFITSpath
             img solver.import-WCS
         s" ASTAP" img FRAME_METADATA @ =>" SOLVER"
         s" SOLVED" img FRAME_METADATA @ =>" SOLVSTAT"
+        img FRAME_METADATA @ solver.solved-metadata
         0
     else
         drop
