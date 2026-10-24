@@ -4,6 +4,7 @@ NEED simple-tester
 include "%libdir%\ForthAstroFormats\ForthAstroFormats_test_support.f"
 NEED ForthASTAP
 
+s" E:\images" $-> astro.root
 0 value ASTAP.path-test.frame
 
 : ASTAP.path-test-FITS { frame suffix-addr suffix-u filepath-buffer -- }

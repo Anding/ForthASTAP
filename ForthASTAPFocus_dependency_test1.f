@@ -16,5 +16,3 @@ T{ s" E:\coding\ForthASTAP\Testdata\focus\exitcode.txt"
 	ASTAP.readFocus
 }T 11 2569 0 ==
 Tend
-
-bye
