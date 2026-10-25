@@ -7,7 +7,9 @@ need simple-tester
 4 3 1 allocate-frame constant wcs.image
 
 : ASTAP.fixture-geometry ( caddr u -- width height depth )
-    xisf.open-FITSfile abort" Cannot open ASTAP fixture" >R
+    xisf.open-FITSfile if
+        1 Tfailures +! cr ." Cannot open ASTAP fixture" cr 0 0 0 exit
+    then >R
     R@ XISF.scan-FITSgeometry
     R> close-file drop
 ;
@@ -30,7 +32,7 @@ T{ s" E:\images\tests\astap\known-good\LUM-E8-F5100-12365844e78a.fits"
 }T -1 ==
 T{ s" E:\images\tests\astap\known-good\LUM-E8-F5100-12365844e78a.wcs"
    wcs.image solver.import-WCS
-}T ==
+}T 0 ==
 T{ s" CRVAL1" wcs.image FRAME_METADATA @ map@ nip 0> }T -1 ==
 T{ s" CTYPE1" wcs.image FRAME_METADATA @ map@ drop 8 hashS }T s" RA---TAN" hashS ==
 

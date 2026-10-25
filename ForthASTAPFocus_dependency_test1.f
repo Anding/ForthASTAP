@@ -3,15 +3,9 @@
 NEED simple-tester
 NEED ForthASTAPFocus
 
-[DEFINED] solve-image [IF]
-	abort" ForthASTAPFocus must not define solve-image"
-[THEN]
-
-[DEFINED] allocate-frame [IF]
-	abort" ForthASTAPFocus must not load frame formats"
-[THEN]
-
 Tstart
+T{ [DEFINED] solve-image }T 0 ==
+T{ [DEFINED] allocate-frame }T 0 ==
 T{ s" E:\coding\ForthASTAP\Testdata\focus\exitcode.txt"
 	ASTAP.readFocus
 }T 11 2569 0 ==

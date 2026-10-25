@@ -24,6 +24,7 @@ s" 11111111-2222-3333-4444-555555555555"
     ASTAP.path-test.frame FRAME_METADATA @ =>" UUID"
 
 Tstart
+T{ s" NAXIS1  = 640" FITS.read-line drop hashS -rot hashS swap }T s" 640" hashS s" NAXIS1" hashS ==
 T{ ASTAP.path-test.frame ASTAP.save-temp-FITS }T ==
 T{ ASTAP.tempFITSpath buffer-to-string hashS
 }T s" E:\images\working\11111111-2222-3333-4444-555555555555\solve.fits" hashS ==

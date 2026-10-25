@@ -67,9 +67,11 @@ FILEPATH_SIZE allocate-buffer constant ASTAP.tempFITSpath
 ;
 
 : ASTAP.write-temp-FITSfilepath
-    ( img suffix-addr suffix-u filepath-buffer -- )
+    { img suffix-addr suffix-u filepath-buffer -- }
 \ Build the pathname stem for ASTAP's private solver image.
-    solver.temp-FITSfilepath abort" ASTAP filepath buffer full"
+    img suffix-addr suffix-u filepath-buffer solver.temp-FITSfilepath if
+        filepath-buffer reset-buffer cr ." ASTAP filepath buffer full" cr
+    then
 ;
 
 : ASTAP.save-temp-FITS ( img -- )
@@ -80,11 +82,12 @@ FILEPATH_SIZE allocate-buffer constant ASTAP.tempFITSpath
 : ASTAP.solve-image { img -- solved? }
 \ Save through private path policy, solve, and append solution data to the map.
     img ASTAP.save-temp-FITS
+    ASTAP.tempFITSpath buffer_used 0= if img no-solver exit then
     ASTAP.tempFITSpath buffer-to-string ASTAP.solveFile
     dup 0= if
         drop 2drop
         ASTAP.tempFITSpath buffer-to-string ASTAP.wcs-filepath
-            img solver.import-WCS
+            img solver.import-WCS if img no-solver exit then
         s" ASTAP" img FRAME_METADATA @ solver.mark-solved
         0
     else
