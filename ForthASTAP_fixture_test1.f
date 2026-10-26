@@ -1,7 +1,7 @@
 \ Integration coverage for known-good ASTAP fixture images.
 
 need ForthASTAP
-need ForthImageLoaders
+need ForthAstroFormats
 need simple-tester
 
 4 3 1 allocate-frame constant wcs.image
